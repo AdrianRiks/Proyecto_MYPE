@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Moda Urbana - Contacto</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      font-family: Arial, Helvetica, sans-serif;
+      background: #f2f5f9;
+      margin: 0;
+      padding: 20px;
+      color: #222;
+    }
+    h1 { text-align: center; color: #6f3b26; margin-bottom: 6px; }
+    .subtitulo { text-align: center; color: #555; font-size: 14px; margin-bottom: 18px; }
+    .nav { text-align: center; margin-bottom: 24px; }
+    .nav a {
+      display: inline-block;
+      padding: 8px 14px;
+      margin: 4px;
+      background: #e6d3c8;
+      color: #4a2516;
+      text-decoration: none;
+      border-radius: 6px;
+      font-weight: bold;
+      font-size: 14px;
+    }
+    .nav a.activo { background: #6f3b26; color: #fff; }
+    .contenedor {
+      max-width: 1050px;
+      margin: auto;
+      display: grid;
+      grid-template-columns: 1fr 1.5fr;
+      gap: 20px;
+    }
+    .tarjeta {
+      background: #fff;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+    label { display: block; margin-top: 12px; font-weight: bold; font-size: 14px; }
+    input[type="text"], input[type="tel"], input[type="email"], select, textarea {
+      width: 100%;
+      padding: 8px;
+      margin-top: 4px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-family: inherit;
+    }
+    .opciones label { display: inline; font-weight: normal; margin-right: 12px; }
+    button {
+      margin-top: 16px;
+      padding: 10px 16px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    .btn-registrar { background: #6f3b26; color: #fff; width: 100%; }
+    .btn-eliminar { background: #c0392b; color: #fff; padding: 5px 10px; margin: 0; }
+    .error { color: #c0392b; font-size: 14px; margin-top: 10px; font-weight: bold; }
+    table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+    th, td { border: 1px solid #ddd; padding: 8px; text-align: left; font-size: 13px; }
+    th { background: #6f3b26; color: #fff; }
+    tr:nth-child(even) { background: #f9f6f4; }
+    .resumen { display: flex; gap: 10px; flex-wrap: wrap; }
+    .resumen div {
+      flex: 1;
+      background: #e6d3c8;
+      padding: 10px;
+      border-radius: 8px;
+      text-align: center;
+      font-size: 13px;
+    }
+    .resumen strong { display: block; font-size: 20px; margin-top: 4px; }
+    @media (max-width: 750px) {
+      .contenedor { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Moda Urbana</h1>
+  <p class="subtitulo">Formulario de contacto y consultas de clientes</p>
+
+
+  <div class="contenedor">
+    <div class="tarjeta">
+      <h2>Enviar consulta</h2>
+      <form id="formRegistro">
+        <label for="nombre">Nombre completo</label>
+        <input type="text" id="nombre" placeholder="Ej. Luis Paredes">
+
+        <label for="telefono">Teléfono (9 dígitos)</label>
+        <input type="tel" id="telefono" maxlength="9" placeholder="Ej. 987654321">
+
+        <label for="correo">Correo electrónico</label>
+        <input type="email" id="correo" placeholder="Ej. luis@correo.com">
+
+        <label for="motivo">Motivo de consulta</label>
+        <select id="motivo">
+          <option value="">-- Seleccione --</option>
+          <option>Disponibilidad de tallas</option>
+          <option>Colores y modelos</option>
+          <option>Pedido especial</option>
+          <option>Otro motivo</option>
+        </select>
+
+        <label for="mensaje">Mensaje</label>
+        <textarea id="mensaje" rows="3" placeholder="Escribe tu consulta sobre nuestras prendas..."></textarea>
+
+        <label>Canal de respuesta</label>
+        <div class="opciones">
+          <input type="radio" name="canal" id="whatsapp" value="WhatsApp">
+          <label for="whatsapp">WhatsApp</label>
+          <input type="radio" name="canal" id="email" value="Correo">
+          <label for="email">Correo</label>
+        </div>
+
+        <label style="font-weight: normal; font-size: 13px;">
+          <input type="checkbox" id="acepto"> Acepto el aviso de privacidad para recibir respuesta (Ley N.° 29733)
+        </label>
+
+        <p id="mensajeError" class="error"></p>
+        <button type="submit" class="btn-registrar">Enviar consulta</button>
+      </form>
+    </div>
+
+    <div class="tarjeta">
+      <h2>Consultas registradas</h2>
+      <div class="resumen">
+        <div>Total consultas<strong id="total">0</strong></div>
+        <div>Vía WhatsApp<strong id="totalwhatsapp">0</strong></div>
+        <div>Vía Correo<strong id="totalcorreo">0</strong></div>
+      </div>
+
+      <table>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Cliente</th>
+            <th>Teléfono</th>
+            <th>Motivo</th>
+            <th>Canal</th>
+            <th>Acción</th>
+          </tr>
+        </thead>
+        <tbody id="tablacuerpo">
+          <tr><td colspan="6">Aún no hay consultas registradas.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <script>
+    let consultas = [];
+
+    try {
+      const guardados = localStorage.getItem("consultas_moda");
+      if (guardados) consultas = JSON.parse(guardados);
+    } catch (e) {
+      consultas = [];
+    }
+
+    const formulario = document.getElementById("formRegistro");
+    const mensajeError = document.getElementById("mensajeError");
+
+    formulario.addEventListener("submit", function (evento) {
+      evento.preventDefault();
+
+      const nombre = document.getElementById("nombre").value.trim();
+      const telefono = document.getElementById("telefono").value.trim();
+      const correo = document.getElementById("correo").value.trim();
+      const motivo = document.getElementById("motivo").value;
+      const mensaje = document.getElementById("mensaje").value.trim();
+      const canalMarcado = document.querySelector('input[name="canal"]:checked');
+      const acepto = document.getElementById("acepto").checked;
+
+      if (nombre === "" || correo === "" || motivo === "" || mensaje === "") {
+        mensajeError.textContent = "Complete todos los campos requeridos.";
+        return;
+      }
+      if (!/^\d{9}$/.test(telefono)) {
+        mensajeError.textContent = "El teléfono debe contener 9 dígitos.";
+        return;
+      }
+      if (!canalMarcado) {
+        mensajeError.textContent = "Seleccione el canal de respuesta.";
+        return;
+      }
+      if (!acepto) {
+        mensajeError.textContent = "Debe aceptar el aviso de privacidad.";
+        return;
+      }
+
+      consultas.push({
+        nombre: nombre,
+        telefono: telefono,
+        correo: correo,
+        motivo: motivo,
+        mensaje: mensaje,
+        canal: canalMarcado.value
+      });
+
+      mensajeError.textContent = "";
+      formulario.reset();
+      guardar();
+      mostrarResultados();
+    });
+
+    function mostrarResultados() {
+      const cuerpo = document.getElementById("tablacuerpo");
+      cuerpo.innerHTML = "";
+
+      if (consultas.length === 0) {
+        cuerpo.innerHTML = '<tr><td colspan="6">Aún no hay consultas registradas.</td></tr>';
+      }
+
+      consultas.forEach(function (c, indice) {
+        const fila = document.createElement("tr");
+        fila.innerHTML = `
+          <td>${indice + 1}</td>
+          <td>${c.nombre}</td>
+          <td>${c.telefono}</td>
+          <td>${c.motivo}</td>
+          <td>${c.canal}</td>
+          <td><button class="btn-eliminar" onclick="eliminar(${indice})">Eliminar</button></td>
+        `;
+        cuerpo.appendChild(fila);
+      });
+
+      document.getElementById("total").textContent = consultas.length;
+      document.getElementById("totalwhatsapp").textContent = consultas.filter(c => c.canal === "WhatsApp").length;
+      document.getElementById("totalcorreo").textContent = consultas.filter(c => c.canal === "Correo").length;
+    }
+
+    function eliminar(indice) {
+      if (confirm("¿Está seguro de eliminar esta consulta?")) {
+        consultas.splice(indice, 1);
+        guardar();
+        mostrarResultados();
+      }
+    }
+
+    function guardar() {
+      try {
+        localStorage.setItem("consultas_moda", JSON.stringify(consultas));
+      } catch (e) {}
+    }
+
+    mostrarResultados();
+  </script>
+</body>
+</html>
