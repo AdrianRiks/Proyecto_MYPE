@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Moda Urbana | Registro de Clientes</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      font-family: Arial, Helvetica, sans-serif;
+      background: #f2f5f9;
+      margin: 0;
+      padding: 20px;
+      color: #222;
+    }
+    h1 { text-align: center; color: #1d3557; }
+    .contenedor {
+      max-width: 1000px;
+      margin: auto;
+      display: grid;
+      grid-template-columns: 1fr 1.5fr;
+      gap: 20px;
+    }
+    .tarjeta {
+      background: #fff;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    label { display: block; margin-top: 12px; font-weight: bold; }
+    input[type="text"], input[type="email"], input[type="number"], select {
+      width: 100%;
+      padding: 8px;
+      margin-top: 4px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+    }
+    .opciones label { display: inline; font-weight: normal; margin-right: 10px; }
+    button {
+      margin-top: 16px;
+      padding: 10px 16px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    .btn-registrar { background: #1d3557; color: #fff; width: 100%; }
+    .btn-eliminar { background: #e63946; color: #fff; padding: 5px 10px; margin: 0; }
+    .error { color: #e63946; font-size: 14px; margin-top: 10px; }
+    table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+    th, td { border: 1px solid #ddd; padding: 8px; text-align: left; font-size: 14px; }
+    th { background: #1d3557; color: #fff; }
+    tr:nth-child(even) { background: #f7f7f7; }
+    .resumen { display: flex; gap: 10px; flex-wrap: wrap; }
+    .resumen div {
+      flex: 1;
+      background: #a8dadc;
+      padding: 10px;
+      border-radius: 8px;
+      text-align: center;
+    }
+    .resumen strong { display: block; font-size: 22px; }
+    @media (max-width: 700px) {
+      .contenedor { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+
+<body>
+
+<h1>Registro de Clientes </h1>
+
+<div class = "contenedor">
+
+<!-- ===== FORMULARIO ===== -->
+
+<div class = "tarjeta">
+<h2>Formulario de registro de clientes</h2>
+<form id = "formRegistro">
+
+<label for="id_cliente">Código de cliente</label>
+<input type="text" id="id_cliente" maxlength="5" placeholder="5 Dígitos (Ej: C0001)">
+
+<label for="nombre">Nombres y Apellidos</label>
+<input type="text" id="nombre" placeholder="Ej. Pedro Paulet">
+
+<label for="dni">DNI</label>
+<input type="text" id="dni" maxlength="8" placeholder="8 Dígitos">
+
+<label for="correo">Correo</label>
+<input type="email" id="correo" placeholder="ejemplo@gmail.com">
+
+<label for="telefono">Teléfono</label>
+<input type="text" id="telefono" maxlength="9" placeholder="9 Dígitos">
+
+<label>Tipo de cliente</label>
+<div class="opciones">
+
+<input type="radio" name="tipo_persona" id="natural" value="Natural">
+<label for="natural">Natural</label>
+
+<input type="radio" name="tipo_persona" id="naturalNegocio" value="Juridico">
+<label for="naturalNegocio">Natural con negocio</label>
+
+</div>
+
+<div id="RUC">
+    <label for ="ruc">RUC</label>
+    <input type="text" id="ruc" maxlength="11" placeholder="11 digitos (Ej. 29083457431)">
+</div>
+
+<label>
+<input type="checkbox" id="acepto"> He leído y acepto los Términos y Condiciones del registro de clientes</label>
+
+<p id="mensajeError" class="error"></p>
+<button type="submit" class="btn-registrar">Registrar</button>
+</form>
+</div>
+
+
+<!-- ==== RESULTADOS ==== -->
+<div class="tarjeta">
+<h2>Resultados</h2>
+
+<div class="resumen">
+<div>Total<strong id="total">0</strong></div>
+<div>Natural<strong id="totalnatural">0</strong></div>
+<div>NaturalNegocio<strong id="totalNaturalNegocio">0</strong></div>
+</div>
+
+<table>
+ <thead>
+  <tr>
+   <th>#</th>
+   <th>Codigo</th>
+   <th>Nombres</th>
+   <th>DNI</th>
+   <th>Correo</th>
+   <th>RUC</th>
+   <th>Telefono</th>
+   <th>Tipo_persona</th>
+   <th>Acción</th>
+</tr>
+</thead>
+<tbody id="tablaCuerpo">
+<tr><td colspan="9">"Aún no hay registros".</td></tr>
+</tbody>
+</table>
+</div>
+
+</div>
+
+
+
+<script>
+//1. Arreglo donde se guardan los registros
+
+let clientes =[];
+
+//Recuperar datos guardados si es que existen
+
+try {
+
+const guardados = localStorage.getItem("clientes");
+if (guardados) clientes = JSON.parse(guardados);
+} catch (e) {clientes=[];}
+
+const formulario = document.getElementById("formRegistro");
+const mensajeError = document.getElementById("mensajeError");
+
+//Evento al enviar el formulario
+
+formulario.addEventListener("submit", function (evento) {evento.preventDefault(); //para evitar que la pag se recargue.
+
+//Leer valores:
+
+ const id_cliente= document.getElementById("id_cliente").value.trim();
+ const nombre = document.getElementById("nombre").value.trim();
+ const dni= document.getElementById("dni").value.trim();
+ const telefono= document.getElementById("telefono").value.trim();
+ const correo= document.getElementById("correo").value.trim();
+ const tipo_personaMarcada= document.querySelector('input[name="tipo_persona"]:checked');
+ const acepto= document.getElementById("acepto").checked;
+ const ruc=document.getElementById("ruc").value.trim();
+
+//3. Validaciones
+
+if (id_cliente==="" || nombre==="" || correo === "") {mensajeError.textContent = "Complete todos los campos.";
+return;
+}
+
+if (!/^\d{8}$/.test(dni))
+{mensajeError.textContent = "El DNI debe tener 8 dígitos.";
+return;
+}
+
+if (!/^\d{9}$/.test(telefono))
+{mensajeError.textContent = "El telefono debe tener 9 dígitos.";
+return;
+}
+
+if (clientes.some(p=> p.dni === dni))
+{mensajeError.textContent = "El DNI ya está registrado.";
+return;
+}
+
+if (clientes.some(p=> p.id_cliente === id_cliente))
+{mensajeError.textContent = "Este codigo ya está registrado.";
+return;
+}
+
+if (!tipo_personaMarcada){
+mensajeError.textContent = "Seleccione un valor.";
+return;
+}
+
+if (tipo_personaMarcada && tipo_personaMarcada.value === "Juridico")
+{
+    if (ruc === "")
+    {
+        mensajeError.textContent = "Debe ingresar un RUC valido para registrar este cliente.";
+        return;
+    }
+    if (!/^\d{11}$/.test(ruc)) 
+    {
+        mensajeError.textContent = "Error. La longitud del RUC debe ser de 11 digitos.";
+        return;
+    }
+}
+
+if (!acepto){
+mensajeError.textContent = "Debe aceptar los términos";
+return;
+}
+	//4. Crear objeto y agregarlo al arreglo
+ const cliente = {
+  id_cliente:id_cliente,
+	nombre: nombre,
+	dni: dni,
+  telefono:telefono,
+	correo: correo,
+  ruc:ruc,
+	tipo_persona: tipo_personaMarcada.value
+	};
+	clientes.push(cliente);
+
+	mensajeError.textContent = "";
+	formulario.reset();
+	guardar();
+	mostrarResultados();
+      });
+
+//5. Mostrar la tabla y el resumen:
+
+function mostrarResultados(){
+
+const cuerpo = document.getElementById("tablaCuerpo");
+cuerpo.innerHTML = "";
+
+if(clientes.length ===0) {
+cuerpo.innerHTML = '<tr><td colspan="9">Aún no hay registros</td></tr>';
+}
+
+clientes.forEach(function(p, indice) {
+const fila = document.createElement("tr");
+fila.innerHTML = `
+
+<td>${indice+1}</td>
+<td>${p.id_cliente}</td>
+<td>${p.nombre}</td>
+<td>${p.dni}</td>
+<td>${p.correo}</td>
+<td>${p.ruc}</td>
+<td>${p.telefono}</td>
+<td>${p.tipo_persona}</td>
+<td><button class= "btn-eliminar" onclick= "eliminar(${indice})">Eliminar</button></td>
+`;
+cuerpo.appendChild(fila);
+});
+
+//Resumen:
+
+const total = clientes.length;
+const natural = clientes.filter(p => p.tipo_persona === "Natural").length;
+const naturalNegocio = clientes.filter(p => p.tipo_persona === "NaturalNegocio").length;
+
+document.getElementById("total").textContent = total;
+document.getElementById("totalNatural").textContent = natural;
+document.getElementById("totalNaturalNegocio").textContent = naturalNegocio;
+}
+
+//6. Eliminar un registro:
+function eliminar(indice) {
+if (confirm("¿Eliminar este registro?")) {
+	clientes.splice(indice, 1);
+	guardar();
+	mostrarResultados();
+	}
+}
+
+//7. Guardar en navegador
+function guardar() {
+try {
+	localStorage.setItem("clientes", JSON.stringify(clientes));
+} catch (e) {}
+}
+mostrarResultados();
+</script>
+
+</body>
+</html>
