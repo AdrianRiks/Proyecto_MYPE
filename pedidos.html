@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Moda Urbana - Mi Pedido</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      font-family: Arial, Helvetica, sans-serif;
+      background: #f2f5f9;
+      margin: 0;
+      padding: 20px;
+      color: #222;
+    }
+    h1 { text-align: center; color: #6f3b26; margin-bottom: 6px; }
+    .subtitulo { text-align: center; color: #555; font-size: 14px; margin-bottom: 18px; }
+    .nav { text-align: center; margin-bottom: 24px; }
+    .nav a {
+      display: inline-block;
+      padding: 8px 14px;
+      margin: 4px;
+      background: #e6d3c8;
+      color: #4a2516;
+      text-decoration: none;
+      border-radius: 6px;
+      font-weight: bold;
+      font-size: 14px;
+    }
+    .nav a.activo { background: #6f3b26; color: #fff; }
+    .contenedor {
+      max-width: 1100px;
+      margin: auto;
+      display: grid;
+      grid-template-columns: 1fr 1.6fr;
+      gap: 20px;
+    }
+    .tarjeta {
+      background: #fff;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+    label { display: block; margin-top: 12px; font-weight: bold; font-size: 14px; }
+    input[type="text"], input[type="tel"], input[type="number"], select {
+      width: 100%;
+      padding: 8px;
+      margin-top: 4px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-family: inherit;
+    }
+    .opciones label { display: inline; font-weight: normal; margin-right: 12px; }
+    button {
+      margin-top: 16px;
+      padding: 10px 16px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    .btn-registrar { background: #6f3b26; color: #fff; width: 100%; }
+    .btn-eliminar { background: #c0392b; color: #fff; padding: 5px 10px; margin: 0; }
+    .error { color: #c0392b; font-size: 14px; margin-top: 10px; font-weight: bold; }
+    table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+    th, td { border: 1px solid #ddd; padding: 8px; text-align: left; font-size: 13px; }
+    th { background: #6f3b26; color: #fff; }
+    tr:nth-child(even) { background: #f9f6f4; }
+    .resumen { display: flex; gap: 10px; flex-wrap: wrap; }
+    .resumen div {
+      flex: 1;
+      background: #e6d3c8;
+      padding: 10px;
+      border-radius: 8px;
+      text-align: center;
+      font-size: 13px;
+    }
+    .resumen strong { display: block; font-size: 20px; margin-top: 4px; }
+    @media (max-width: 750px) {
+      .contenedor { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Moda Urbana</h1>
+  <p class="subtitulo">Formulario de registro y control de pedidos</p>
+
+  <div class="nav">
+   <a href="principal.html">Inicio</a>
+   <a href="pedidos.html">Hacer Pedido</a>
+   <a href="formulario de productos.html">Agregar Productos</a>
+   <a href="proy_PG_clientes.html">Registrar Clientes</a>
+   <a href="proy_PG_vendedores.html">Registrar Vendedor</a>
+   <a href="contacto.html">Contacto</a>
+  </div>
+
+  <div class="contenedor">
+    <!-- ===== FORMULARIO ===== -->
+    <div class="tarjeta">
+      <h2>Registrar pedido</h2>
+      <form id="formRegistro">
+        <label for="cliente">Nombre del cliente</label>
+        <input type="text" id="cliente" placeholder="Ej. Luis Paredes">
+
+        <label for="telefono">Teléfono (9 dígitos)</label>
+        <input type="tel" id="telefono" maxlength="9" placeholder="Ej. 987654321">
+
+        <label for="prenda">Prenda</label>
+        <select id="prenda">
+          <option value="">-- Seleccione --</option>
+          <option value="Polo urbano clásico|49.90">Polo urbano clásico - S/ 49.90</option>
+          <option value="Jean moderno|89.90">Jean moderno - S/ 89.90</option>
+          <option value="Casaca urbana|119.90">Casaca urbana - S/ 119.90</option>
+          <option value="Gorra casual|35.90">Gorra casual - S/ 35.90</option>
+        </select>
+
+        <label for="talla">Talla</label>
+        <select id="talla">
+          <option value="">-- Seleccione --</option>
+          <option>S</option>
+          <option>M</option>
+          <option>L</option>
+          <option>XL</option>
+        </select>
+
+        <label for="cantidad">Cantidad</label>
+        <input type="number" id="cantidad" min="1" placeholder="Ej. 2">
+
+        <label for="vendedor">Vendedor</label>
+        <select id="vendedor">
+          <option value="">-- Seleccione --</option>
+          <option>Compra Web</option>
+          <option>Carlos Mendoza</option>
+          <option>Lucía Fernández</option>
+          <option>Ana Torres</option>
+        </select>
+
+        <label>Modalidad de entrega</label>
+        <div class="opciones">
+          <input type="radio" name="entrega" id="tienda" value="Recojo en Tienda">
+          <label for="tienda">Recojo en Tienda</label>
+          <input type="radio" name="entrega" id="delivery" value="Delivery">
+          <label for="delivery">Delivery</label>
+        </div>
+
+        <label style="font-weight: normal; font-size: 13px;">
+          <input type="checkbox" id="acepto"> Acepto el uso de mis datos para gestionar este pedido (Ley N.° 29733)
+        </label>
+
+        <p id="mensajeError" class="error"></p>
+        <button type="submit" class="btn-registrar">Confirmar pedido</button>
+      </form>
+    </div>
+
+    <!-- ===== RESULTADOS ===== -->
+    <div class="tarjeta">
+      <h2>Pedidos realizados</h2>
+      <div class="resumen">
+        <div>Total pedidos<strong id="total">0</strong></div>
+        <div>En tienda<strong id="totaltiendas">0</strong></div>
+        <div>Delivery<strong id="totaldelivery">0</strong></div>
+        <div>Total vendido<strong id="totalmonto">S/ 0.00</strong></div>
+      </div>
+
+      <table>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Cliente</th>
+            <th>Prenda</th>
+            <th>Talla / Cant.</th>
+            <th>Vendedor</th>
+            <th>Entrega</th>
+            <th>Total</th>
+            <th>Acción</th>
+          </tr>
+        </thead>
+        <tbody id="tablacuerpo">
+          <tr><td colspan="8">Aún no hay pedidos registrados.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <script>
+    let pedidos = [];
+
+    try {
+      const guardados = localStorage.getItem("pedidos_moda");
+      if (guardados) pedidos = JSON.parse(guardados);
+    } catch (e) {
+      pedidos = [];
+    }
+
+    const formulario = document.getElementById("formRegistro");
+    const mensajeError = document.getElementById("mensajeError");
+
+    formulario.addEventListener("submit", function (evento) {
+      evento.preventDefault();
+
+      const cliente = document.getElementById("cliente").value.trim();
+      const telefono = document.getElementById("telefono").value.trim();
+      const prendaValor = document.getElementById("prenda").value;
+      const talla = document.getElementById("talla").value;
+      const cantidad = parseInt(document.getElementById("cantidad").value);
+      const vendedor = document.getElementById("vendedor").value;
+      const entregaMarcada = document.querySelector('input[name="entrega"]:checked');
+      const acepto = document.getElementById("acepto").checked;
+
+      if (cliente === "" || prendaValor === "" || talla === "" || vendedor === "") {
+        mensajeError.textContent = "Complete todos los campos requeridos.";
+        return;
+      }
+      if (!/^\d{9}$/.test(telefono)) {
+        mensajeError.textContent = "El teléfono debe contener 9 dígitos.";
+        return;
+      }
+      if (isNaN(cantidad) || cantidad < 1) {
+        mensajeError.textContent = "Ingrese una cantidad válida (mínimo 1).";
+        return;
+      }
+      if (!entregaMarcada) {
+        mensajeError.textContent = "Seleccione la modalidad de entrega.";
+        return;
+      }
+      if (!acepto) {
+        mensajeError.textContent = "Debe aceptar el uso de datos personales.";
+        return;
+      }
+
+      const datosPrenda = prendaValor.split("|");
+      const nombrePrenda = datosPrenda[0];
+      const precioUnitario = parseFloat(datosPrenda[1]);
+      const subtotal = precioUnitario * cantidad;
+
+      pedidos.push({
+        cliente: cliente,
+        telefono: telefono,
+        prenda: nombrePrenda,
+        talla: talla,
+        cantidad: cantidad,
+        vendedor: vendedor,
+        entrega: entregaMarcada.value,
+        total: subtotal
+      });
+
+      mensajeError.textContent = "";
+      formulario.reset();
+      guardar();
+      mostrarResultados();
+    });
+
+    function mostrarResultados() {
+      const cuerpo = document.getElementById("tablacuerpo");
+      cuerpo.innerHTML = "";
+
+      if (pedidos.length === 0) {
+        cuerpo.innerHTML = '<tr><td colspan="8">Aún no hay pedidos registrados.</td></tr>';
+      }
+
+      pedidos.forEach(function (p, indice) {
+        const fila = document.createElement("tr");
+        fila.innerHTML = `
+          <td>${indice + 1}</td>
+          <td>${p.cliente} (${p.telefono})</td>
+          <td>${p.prenda}</td>
+          <td>${p.talla} (x${p.cantidad})</td>
+          <td>${p.vendedor}</td>
+          <td>${p.entrega}</td>
+          <td>S/ ${p.total.toFixed(2)}</td>
+          <td><button type="button" class="btn-eliminar" onclick="eliminar(${indice})">Eliminar</button></td>
+        `;
+        cuerpo.appendChild(fila);
+      });
+
+      const sumaTotal = pedidos.reduce((suma, p) => suma + p.total, 0);
+
+      document.getElementById("total").textContent = pedidos.length;
+      document.getElementById("totaltiendas").textContent = pedidos.filter(p => p.entrega === "Recojo en Tienda").length;
+      document.getElementById("totaldelivery").textContent = pedidos.filter(p => p.entrega === "Delivery").length;
+      document.getElementById("totalmonto").textContent = "S/ " + sumaTotal.toFixed(2);
+    }
+
+    function eliminar(indice) {
+      if (confirm("¿Está seguro de eliminar este pedido?")) {
+        pedidos.splice(indice, 1);
+        guardar();
+        mostrarResultados();
+      }
+    }
+
+    function guardar() {
+      try {
+        localStorage.setItem("pedidos_moda", JSON.stringify(pedidos));
+      } catch (e) {}
+    }
+
+    mostrarResultados();
+  </script>
+</body>
+</html>
