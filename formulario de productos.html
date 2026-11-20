@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Registro de productos | Moda Urbana</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      font-family: Arial, Helvetica, sans-serif;
+      background: #f2f5f9;
+      margin: 0;
+      padding: 20px;
+      color: #222;
+    }
+    h1 { text-align: center; color: #6b3d2b; }
+    .subtitulo { text-align: center; margin-bottom: 24px; color: #555; }
+    .contenedor {
+      max-width: 1100px;
+      margin: auto;
+      display: grid;
+      grid-template-columns: 1fr 1.5fr;
+      gap: 20px;
+    }
+    .tarjeta {
+      background: #fff;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    label { display: block; margin-top: 12px; font-weight: bold; }
+    input[type="text"], input[type="number"], select {
+      width: 100%;
+      padding: 9px;
+      margin-top: 4px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+    }
+    button {
+      margin-top: 16px;
+      padding: 10px 16px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    .btn-registrar { background: #6b3d2b; color: #fff; width: 100%; }
+    .btn-eliminar { background: #b83232; color: #fff; padding: 5px 10px; margin: 0; }
+    .error { color: #b42318; font-size: 14px; margin-top: 10px; }
+    .exito { color: #16723b; font-size: 14px; margin-top: 10px; }
+    table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+    th, td { border: 1px solid #ddd; padding: 8px; text-align: left; font-size: 13px; }
+    th { background: #6b3d2b; color: #fff; }
+    tr:nth-child(even) { background: #f7f7f7; }
+    .resumen { display: flex; gap: 10px; flex-wrap: wrap; }
+    .resumen div {
+      flex: 1;
+      min-width: 110px;
+      background: #ead8cd;
+      padding: 10px;
+      border-radius: 8px;
+      text-align: center;
+    }
+    .resumen strong { display: block; font-size: 22px; }
+    .tabla-contenedor { overflow-x: auto; }
+    @media (max-width: 700px) {
+      .contenedor { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <h1>Moda Urbana</h1>
+  <p class="subtitulo">Formulario de registro y control de productos</p>
+
+  <main class="contenedor">
+    <!-- FORMULARIO: adaptado de la plantilla index_2 -->
+    <section class="tarjeta">
+      <h2>Registrar producto</h2>
+      <form id="formProducto">
+        <label for="codigo">Código del producto</label>
+        <input type="text" id="codigo" maxlength="12" placeholder="Ej. MU001" required>
+
+        <label for="nombre">Nombre de la prenda</label>
+        <input type="text" id="nombre" maxlength="60" placeholder="Ej. Polo básico" required>
+
+        <label for="categoria">Categoría</label>
+        <select id="categoria" required>
+          <option value="">-- Seleccione --</option>
+          <option>Damas</option>
+          <option>Caballeros</option>
+          <option>Accesorios</option>
+        </select>
+
+        <label for="talla">Talla</label>
+        <select id="talla" required>
+          <option value="">-- Seleccione --</option>
+          <option>XS</option><option>S</option><option>M</option><option>L</option><option>XL</option><option>Única</option>
+        </select>
+
+        <label for="color">Color</label>
+        <input type="text" id="color" maxlength="30" placeholder="Ej. Negro" required>
+
+        <label for="precio">Precio (S/)</label>
+        <input type="number" id="precio" min="0.01" step="0.01" placeholder="Ej. 39.90" required>
+
+        <label for="stock">Stock disponible</label>
+        <input type="number" id="stock" min="0" step="1" placeholder="Ej. 10" required>
+
+        <p id="mensajeError" role="status" aria-live="polite"></p>
+        <button type="submit" class="btn-registrar">Registrar producto</button>
+      </form>
+    </section>
+
+    <!-- RESULTADOS: estructura basada en la tarjeta de resultados de index_2 -->
+    <section class="tarjeta">
+      <h2>Productos registrados</h2>
+      <div class="resumen">
+        <div>Total de productos<strong id="totalProductos">0</strong></div>
+        <div>Unidades en stock<strong id="totalStock">0</strong></div>
+        <div>Valor del inventario<strong id="valorInventario">S/ 0.00</strong></div>
+      </div>
+
+      <div class="tabla-contenedor">
+        <table>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Código</th>
+              <th>Prenda</th>
+              <th>Talla</th>
+              <th>Color</th>
+              <th>Precio</th>
+              <th>Stock</th>
+              <th>Acción</th>
+            </tr>
+          </thead>
+          <tbody id="tablaCuerpo">
+            <tr><td colspan="8">Aún no hay productos registrados.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    // 1. Arreglo donde se guardan los productos.
+    let productos = [];
+
+    // 2. Recuperar los datos guardados en este navegador.
+    try {
+      const guardados = localStorage.getItem("productosModaUrbana");
+      if (guardados) productos = JSON.parse(guardados);
+      if (!Array.isArray(productos)) productos = [];
+    } catch (error) {
+      productos = [];
+    }
+
+    const formulario = document.getElementById("formProducto");
+    const mensajeError = document.getElementById("mensajeError");
+
+    // 3. Evento que se ejecuta al enviar el formulario.
+    formulario.addEventListener("submit", function(evento) {
+      evento.preventDefault();
+
+      // Leer los valores ingresados.
+      const codigo = document.getElementById("codigo").value.trim().toUpperCase();
+      const nombre = document.getElementById("nombre").value.trim();
+      const categoria = document.getElementById("categoria").value;
+      const talla = document.getElementById("talla").value;
+      const color = document.getElementById("color").value.trim();
+      const precio = Number(document.getElementById("precio").value);
+      const stock = Number(document.getElementById("stock").value);
+
+      // 4. Validaciones del formulario.
+      if (!codigo || !nombre || !categoria || !talla || !color) {
+        mostrarMensaje("Complete todos los campos.", false);
+        return;
+      }
+
+      if (!/^[A-Z0-9-]{3,12}$/.test(codigo)) {
+        mostrarMensaje("El código debe tener entre 3 y 12 caracteres (letras, números o guion).", false);
+        return;
+      }
+
+      if (productos.some(producto => producto.codigo === codigo)) {
+        mostrarMensaje("Ese código ya está registrado. Ingrese uno diferente.", false);
+        return;
+      }
+
+      if (!Number.isFinite(precio) || precio <= 0) {
+        mostrarMensaje("Ingrese un precio mayor que cero.", false);
+        return;
+      }
+
+      if (!Number.isInteger(stock) || stock < 0) {
+        mostrarMensaje("El stock debe ser un número entero igual o mayor que cero.", false);
+        return;
+      }
+
+      // 5. Crear el objeto y agregarlo al arreglo.
+      const producto = {
+        codigo: codigo,
+        nombre: nombre,
+        categoria: categoria,
+        talla: talla,
+        color: color,
+        precio: precio,
+        stock: stock
+      };
+
+      productos.push(producto);
+
+      // 6. Guardar, limpiar el formulario y actualizar resultados.
+      guardarProductos();
+      formulario.reset();
+      mostrarMensaje("Producto registrado correctamente.", true);
+      mostrarResultados();
+    });
+
+    function mostrarMensaje(texto, correcto) {
+      mensajeError.textContent = texto;
+      mensajeError.className = correcto ? "exito" : "error";
+    }
+
+    function guardarProductos() {
+      localStorage.setItem("productosModaUrbana", JSON.stringify(productos));
+    }
+
+    // 7. Mostrar los productos registrados en la tabla.
+    function mostrarResultados() {
+      const tabla = document.getElementById("tablaCuerpo");
+      tabla.innerHTML = "";
+
+      if (productos.length === 0) {
+        tabla.innerHTML = '<tr><td colspan="8">Aún no hay productos registrados.</td></tr>';
+      }
+
+      productos.forEach(function(producto, indice) {
+        const fila = document.createElement("tr");
+        const valores = [
+          indice + 1,
+          producto.codigo,
+          producto.nombre,
+          producto.talla,
+          producto.color,
+          "S/ " + producto.precio.toFixed(2),
+          producto.stock
+        ];
+
+        valores.forEach(function(valor) {
+          const celda = document.createElement("td");
+          celda.textContent = valor;
+          fila.appendChild(celda);
+        });
+
+        const celdaAccion = document.createElement("td");
+        const boton = document.createElement("button");
+        boton.type = "button";
+        boton.textContent = "Eliminar";
+        boton.className = "btn-eliminar";
+        boton.setAttribute("aria-label", "Eliminar producto " + producto.codigo);
+        boton.addEventListener("click", function() {
+          productos.splice(indice, 1);
+          guardarProductos();
+          mostrarResultados();
+          mostrarMensaje("Producto eliminado de la lista.", true);
+        });
+        celdaAccion.appendChild(boton);
+        fila.appendChild(celdaAccion);
+        tabla.appendChild(fila);
+      });
+
+      // 8. Calcular el resumen del inventario.
+      const totalStock = productos.reduce((suma, producto) => suma + producto.stock, 0);
+      const valorInventario = productos.reduce(
+        (suma, producto) => suma + producto.precio * producto.stock, 0
+      );
+
+      document.getElementById("totalProductos").textContent = productos.length;
+      document.getElementById("totalStock").textContent = totalStock;
+      document.getElementById("valorInventario").textContent = "S/ " + valorInventario.toFixed(2);
+    }
+
+    // Mostrar los datos guardados cuando se abre la página.
+    mostrarResultados();
+  </script>
+</body>
+</html>
