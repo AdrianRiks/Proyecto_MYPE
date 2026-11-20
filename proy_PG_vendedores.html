@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Moda Urbana | Registro de Vendedores</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      font-family: Arial, Helvetica, sans-serif;
+      background: #f2f5f9;
+      margin: 0;
+      padding: 20px;
+      color: #222;
+    }
+    h1 { text-align: center; color: #1d3557; }
+    .contenedor {
+      max-width: 1000px;
+      margin: auto;
+      display: grid;
+      grid-template-columns: 1fr 1.5fr;
+      gap: 20px;
+    }
+    .tarjeta {
+      background: #fff;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    label { display: block; margin-top: 12px; font-weight: bold; }
+    input[type="text"], input[type="email"], input[type="number"], select {
+      width: 100%;
+      padding: 8px;
+      margin-top: 4px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+    }
+    .opciones label { display: inline; font-weight: normal; margin-right: 10px; }
+    button {
+      margin-top: 16px;
+      padding: 10px 16px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    .btn-registrar { background: #1d3557; color: #fff; width: 100%; }
+    .btn-eliminar { background: #e63946; color: #fff; padding: 5px 10px; margin: 0; }
+    .error { color: #e63946; font-size: 14px; margin-top: 10px; }
+    table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+    th, td { border: 1px solid #ddd; padding: 8px; text-align: left; font-size: 14px; }
+    th { background: #1d3557; color: #fff; }
+    tr:nth-child(even) { background: #f7f7f7; }
+    .resumen { display: flex; gap: 10px; flex-wrap: wrap; }
+    .resumen div {
+      flex: 1;
+      background: #a8dadc;
+      padding: 10px;
+      border-radius: 8px;
+      text-align: center;
+    }
+    .resumen strong { display: block; font-size: 22px; }
+    @media (max-width: 700px) {
+      .contenedor { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+
+<body>
+
+<h1>Registro de Vendedores </h1>
+
+<div class = "contenedor">
+
+<!-- ===== FORMULARIO ===== -->
+
+<div class = "tarjeta">
+<h2>Ingrese todos los datos solicitados para registrar un vendedor</h2>
+<form id = "formRegistro">
+
+<label for="id_vendedor">Código de vendedor</label>
+<input type="text" id="id_vendedor" maxlength="5" placeholder="5 Dígitos (Ej: V0001)">
+
+<label for="nombre">Nombres y Apellidos</label>
+<input type="text" id="nombre" placeholder="Ej. Pedro Nacho">
+
+<label for="dni">DNI</label>
+<input type="text" id="dni" maxlength="8" placeholder="8 Dígitos">
+
+<label for="correo">Correo</label>
+<input type="email" id="correo" placeholder="ejemplo@gmail.com">
+
+<label for="edad">Edad</label>
+<input type="number" id="edad" min="18" placeholder="Ej. 18">
+
+<label for="telefono">Teléfono</label>
+<input type="text" id="telefono" maxlength="9" placeholder="9 Dígitos">
+
+<label for="Salario">Salario (S/.)</label>
+<input type="number" id="salario" min=".1" max="9999" step="any" placeholder="Ej. 1000">
+
+
+<label for="turno">Turno</label>
+
+<select id="turno">
+
+ <option value="">--Seleccione--</option>
+ <option >Completo</option>
+ <option >Medio tiempo Mañana</option>
+ <option >Medio tiempo Tarde</option>
+ <option >Otra</option>
+
+</select>
+
+<label>Tipo de puesto</label>
+<div class="opciones">
+
+<input type="radio" name="tipo_puesto" id="presencial" value="Presencial">
+<label for="presencial">Presencial</label>
+
+<input type="radio" name="tipo_puesto" id="whatsapp" value="Whatsapp">
+<label for="whatsapp">Whatsapp</label>
+
+</div>
+
+<label>
+<input type="checkbox" id="acepto"> Acepto términos y Condiciones del sistema de registro de Vendedores</label>
+
+<p id="mensajeError" class="error"></p>
+<button type="submit" class="btn-registrar">Registrar</button>
+</form>
+</div>
+
+
+<!-- ==== RESULTADOS ==== -->
+<div class="tarjeta">
+<h2>Resultados</h2>
+
+<div class="resumen">
+<div>Total<strong id="total">0</strong></div>
+<div>Presencial<strong id="totalpresencial">0</strong></div>
+<div>Whatsapp<strong id="totalwhatsapp">0</strong></div>
+</div>
+
+<table>
+ <thead>
+  <tr>
+   <th>#</th>
+   <th>Codigo</th>
+   <th>Nombres</th>
+   <th>DNI</th>
+   <th>Correo</th>
+   <th>Telefono</th>
+   <th>Salario (S/)</th>
+   <th>Turno</th>
+   <th>Tipo_puesto</th>
+   <th>Acción</th>
+</tr>
+</thead>
+<tbody id="tablaCuerpo">
+<tr><td colspan="10">"Aún no hay registros".</td></tr>
+</tbody>
+</table>
+</div>
+
+</div>
+
+
+
+<script>
+//1. Arreglo donde se guardan los registros
+
+let vendedores =[];
+
+//Recuperar datos guardados si es que existen
+
+try {
+
+const guardados = localStorage.getItem("vendedores");
+if (guardados) vendedores = JSON.parse(guardados);
+} catch (e) {vendedores=[];}
+
+const formulario = document.getElementById("formRegistro");
+const mensajeError = document.getElementById("mensajeError");
+
+//Evento al enviar el formulario
+
+formulario.addEventListener("submit", function (evento) {evento.preventDefault(); //para evitar que la pag se recargue.
+
+//Leer valores:
+
+ const id_vendedor= document.getElementById("id_vendedor").value.trim();
+ const nombre = document.getElementById("nombre").value.trim();
+ const dni= document.getElementById("dni").value.trim();
+ const telefono= document.getElementById("telefono").value.trim();
+ const correo= document.getElementById("correo").value.trim();
+ const edad= parseInt(document.getElementById("edad").value);
+ const turno= document.getElementById("turno").value;
+  const tipo_puestoMarcado= document.querySelector('input[name="tipo_puesto"]:checked');
+ const acepto= document.getElementById("acepto").checked;
+ const salario= document.getElementById("salario").value.trim();
+
+//3. Validaciones
+
+if (salario ==="" ||id_vendedor==="" || nombre==="" || correo === "" || turno=== "") {mensajeError.textContent = "Complete todos los campos.";
+return;
+}
+
+if (isNaN(salario) || salario<=0)
+{mensajeError.textContent = "Ingrese un salario valido (Mayor a 0).";
+return;
+}
+
+if (!/^\d{8}$/.test(dni))
+{mensajeError.textContent = "El DNI debe tener 8 dígitos.";
+return;
+}
+
+if (!/^\d{9}$/.test(telefono))
+{mensajeError.textContent = "El telefono debe tener 9 dígitos.";
+return;
+}
+
+if (vendedores.some(p=> p.dni === dni))
+{mensajeError.textContent = "El DNI ya está registrado.";
+return;
+}
+
+if (vendedores.some(p=> p.id_vendedor === id_vendedor))
+{mensajeError.textContent = "Este codigo ya está registrado.";
+return;
+}
+
+if (isNaN(edad) || edad<18)
+{mensajeError.textContent = "Ingrese una edad valida (18 a mas).";
+return;
+}
+
+if (!tipo_puestoMarcado){
+mensajeError.textContent = "Seleccione un valor.";
+return;
+}
+
+if (!acepto){
+mensajeError.textContent = "Debe aceptar los términos";
+return;
+}
+	//4. Crear objeto y agregarlo al arreglo
+ const vendedor = {
+  id_vendedor:id_vendedor,
+	nombre: nombre,
+	dni: dni,
+    edad:edad,
+    telefono:telefono,
+    salario:salario,
+	correo: correo,
+	turno: turno,
+    tipo_puesto: tipo_puestoMarcado.value
+	};
+	vendedores.push(vendedor);
+
+	mensajeError.textContent = "";
+	formulario.reset();
+	guardar();
+	mostrarResultados();
+      });
+
+//5. Mostrar la tabla y el resumen:
+
+function mostrarResultados(){
+
+const cuerpo = document.getElementById("tablaCuerpo");
+cuerpo.innerHTML = "";
+
+if(vendedores.length ===0) {
+cuerpo.innerHTML = '<tr><td colspan="10">Aún no hay registros</td></tr>';
+}
+
+vendedores.forEach(function(p, indice) {
+const fila = document.createElement("tr");
+fila.innerHTML = `
+
+<td>${indice+1}</td>
+<td>${p.id_vendedor}</td>
+<td>${p.nombre}</td>
+<td>${p.dni}</td>
+<td>${p.correo}</td>
+<td>${p.telefono}</td>
+<td>${p.salario}</td>
+<td>${p.turno}</td>
+<td>${p.tipo_puesto}</td>
+<td><button class= "btn-eliminar" onclick= "eliminar(${indice})">Eliminar</button></td>
+`;
+cuerpo.appendChild(fila);
+});
+
+//Resumen:
+
+const total = vendedores.length;
+const presencial = vendedores.filter(p => p.tipo_puesto === "Presencial").length;
+const whatsapp = vendedores.filter(p => p.tipo_puesto === "Whatsapp").length;
+
+document.getElementById("total").textContent = total;
+document.getElementById("totalpresencial").textContent = presencial;
+document.getElementById("totalwhatsapp").textContent = whatsapp;
+}
+
+//6. Eliminar un registro:
+function eliminar(indice) {
+if (confirm("¿Eliminar este registro?")) {
+	vendedores.splice(indice, 1);
+	guardar();
+	mostrarResultados();
+	}
+}
+
+//7. Guardar en el navegador
+function guardar() {
+try {
+	localStorage.setItem("vendedores", JSON.stringify(vendedores));
+} catch (e) { /* si no hay almacenamiento, se trabaja solo en memoria */}
+}
+mostrarResultados();
+</script>
+
+
+</body>
+</html>
